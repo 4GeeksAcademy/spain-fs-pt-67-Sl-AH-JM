@@ -6,6 +6,7 @@
     on that page only (the ones not reused in other pages).
 */
 
-body {
+body{
+    color: aqua;
     background-color: aliceblue;
 }
