@@ -44,7 +44,6 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.Enum(StatusOrders), nullable=False, default = StatusOrders.pending)
     payment_method = db.Column(db.Enum(PaymentMethods), nullable=False, default = PaymentMethods.credit_card)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Photo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,9 +51,8 @@ class Photo(db.Model):
     bicycle = db.Column(db.Enum(Bikes), nullable=False, default = Bikes.custom)
     helmet = db.Column(db.Enum(Helmets), nullable=False, default = Helmets.custom)
     price = db.Column(db.String(120), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class OrderItems(db.Model): 
     id = db.Column(db.Integer, primary_key=True) 
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
-    photo_id = db.Column(db.Integer, db.ForeignKey('photos.id'), nullable=False) 
+    order_relation = db.Column(db.Integer, db.ForeignKey(Order.id, ondelete="CASCADE"), nullable=False)
+    photo_relation = db.Column(db.Integer, db.ForeignKey(Photo.id, ondelete="CASCADE"), nullable=False)
