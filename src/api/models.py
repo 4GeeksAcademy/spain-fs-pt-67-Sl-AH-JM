@@ -1,4 +1,33 @@
 from flask_sqlalchemy import SQLAlchemy
+import enum
+
+class MyRoles(enum.Enum):
+    photographer = "Photographer"
+    rider = "Rider"
+    admin = "Admin"
+
+class StatusOrders(enum.Enum):
+    pending = "Pending"
+    completed = "Completed"
+    cancelled = "Cancelled"
+
+class PaymentMethods(enum.Enum):
+    credit_card = "Credit_card"
+    paypal = "Paypal"
+    cash = "Cash"
+
+class Bikes(enum.Enum):
+    santa_Cruz = "Santa Cruz"
+    orbea = "Orbea"
+    canyon = "Canyon"
+    custom = "Custom"
+
+class Helmets(enum.Enum):
+    scott = "Scott"
+    troyLee = "TroyLee"
+    bluegrass = "Bluegrass"
+    custom = "Custom"
+
 
 db = SQLAlchemy()
 
@@ -9,27 +38,23 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     name = db.Column(db.String(120), nullable=False)
     firstname = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.Enum('admin', 'user'), nullable=False)
+    role = db.Column(db.Enum(MyRoles), nullable=False, default = MyRoles.rider)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Enum('pending', 'completed', 'cancelled'), nullable=False)
-    payment_method = db.Column(db.Enum('credit_card', 'paypal', 'cash'), nullable=False)
+    status = db.Column(db.Enum(StatusOrders), nullable=False, default = StatusOrders.pending)
+    payment_method = db.Column(db.Enum(PaymentMethods), nullable=False, default = PaymentMethods.credit_card)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('orders', lazy=True))
 
 class Photo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(200), nullable=False)
-    bicycle = db.Column(db.Enum('mountain', 'road', 'hybrid'), nullable=False)
-    helmet = db.Column(db.Enum('full_face', 'open_face', 'modular'), nullable=False)
+    bicycle = db.Column(db.Enum(Bikes), nullable=False, default = Bikes.custom)
+    helmet = db.Column(db.Enum(Helmets), nullable=False, default = Helmets.custom)
     price = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('photos', lazy=True))
 
-class OrderItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    photo_id = db.Column(db.Integer, db.ForeignKey('photo.id'), nullable=False)
-    order = db.relationship('Order', backref=db.backref('order_items', lazy=True))
-    photo = db.relationship('Photo', backref=db.backref('order_items', lazy=True))
+class OrderItems(db.Model): 
+    id = db.Column(db.Integer, primary_key=True) 
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
+    photo_id = db.Column(db.Integer, db.ForeignKey('photos.id'), nullable=False) 
