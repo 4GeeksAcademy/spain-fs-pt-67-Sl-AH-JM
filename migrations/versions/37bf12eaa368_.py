@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ca7a9450dadc
+Revision ID: 37bf12eaa368
 Revises: 
-Create Date: 2024-07-22 18:52:32.757773
+Create Date: 2024-07-24 16:58:46.047098
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ca7a9450dadc'
+revision = '37bf12eaa368'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,7 +35,7 @@ def upgrade():
     sa.Column('status', sa.Enum('pending', 'completed', 'cancelled', name='statusorders'), nullable=False),
     sa.Column('payment_method', sa.Enum('credit_card', 'paypal', 'cash', name='paymentmethods'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('photo',
@@ -45,15 +45,15 @@ def upgrade():
     sa.Column('helmet', sa.Enum('scott', 'troyLee', 'bluegrass', 'custom', name='helmets'), nullable=False),
     sa.Column('price', sa.String(length=120), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('order_items',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('photo_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
-    sa.ForeignKeyConstraint(['photo_id'], ['photo.id'], ),
+    sa.ForeignKeyConstraint(['order_id'], ['order.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['photo_id'], ['photo.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
