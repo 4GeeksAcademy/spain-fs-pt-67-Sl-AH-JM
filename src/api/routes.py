@@ -20,8 +20,23 @@ def get_users():
         "message" : "Nice!",
         "data": users_serialized
     }
-    if not(users):
-        return jsonify({"msg: Users doesn't exist"})
+    if (users == []):
+        return jsonify({"msg": "Not users yet"}), 404
+    return jsonify(response_body), 200
+
+@api.route('/users/<int:user_id>', methods = ['GET'])
+def get_user(user_id): 
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"msg": "User not found"}), 404
+        
+    user_info = User.query.filter_by(id=user_id).first().serialize()
+    print ("AAAAAAAAAAAAAA", user)
+    response_body = {
+        "message" : "Nice!",
+        "data": user_info
+    }
+
     return jsonify(response_body), 200
 
 @api.route('/login', methods=['POST'])
@@ -30,7 +45,7 @@ def login():
     password = request.json.get('password', None)
     users_query = User.query.filter_by(email=email).first()
     if not users_query:
-        return jsonify({"msg": "No existe"}), 402
+        return jsonify({"msg": "Doesn't exist"}), 402
     if password != users_query.password:
         return jsonify({"msg": "Bad username or password"}), 401
     access_token = create_access_token(identity=email)
@@ -65,4 +80,4 @@ def delete_user(user_id):
         db.session.commit()
         return jsonify({"msg": "User deleted"}), 200
     else:
-        return jsonify({"msg": "User don't exist"}), 401
+        return jsonify({"msg": "User doesn't exist"}), 401
