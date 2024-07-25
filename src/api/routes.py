@@ -30,8 +30,7 @@ def get_user(user_id):
     if user is None:
         return jsonify({"msg": "User not found"}), 404
         
-    user_info = User.query.filter_by(id=user_id).first().serialize()
-    print ("AAAAAAAAAAAAAA", user)
+    user_info = User.query.filter_by(id=user_id).first().serialize()    
     response_body = {
         "message" : "Nice!",
         "data": user_info
@@ -81,3 +80,56 @@ def delete_user(user_id):
         return jsonify({"msg": "User deleted"}), 200
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
+    
+@api.route('/orders', methods=['POST'])
+def create_order():
+    data = request.json
+    new_order = Order(**data)
+    db.session.add(new_order)
+    db.session.commit()
+    return jsonify({"msg": "Order created", "order": new_order.serialize()}), 201
+
+
+@api.route('/orders', methods=['GET'])
+def get_orders():
+    orders = Order.query.all()
+    orders_list = [order.serialize() for order in orders]
+    return jsonify({"msg": "Orders retrieved", "orders": orders_list}), 200
+
+
+@api.route('/orders/<int:order_id>', methods=['GET'])
+def get_order(order_id):
+    order = Order.query.get(order_id)
+    if order is None:
+        return jsonify({"msg": "Order not found"}), 404
+
+    return jsonify({"msg": "Order retrieved", "order": order.serialize()}), 200
+
+
+@api.route('/orders/<int:order_id>', methods=['PUT'])
+def update_order(order_id):
+    order = Order.query.get(order_id)
+    if order is None:
+        return jsonify({"msg": "Order not found"}), 404
+
+    data = request.json
+    for key, value in data.items():
+        setattr(order, key, value)
+    db.session.commit()
+
+    return jsonify({"msg": "Order updated", "order": order.serialize()}), 200
+
+
+@api.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    order = Order.query.get(order_id)
+    if order is None:
+        return jsonify({"msg": "Order not found"}), 404
+
+    db.session.delete(order)
+    db.session.commit()
+
+    return jsonify({"msg": "Order deleted"}), 200
+
+
+
