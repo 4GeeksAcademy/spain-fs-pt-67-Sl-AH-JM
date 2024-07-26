@@ -81,3 +81,21 @@ def delete_user(user_id):
         return jsonify({"msg": "User deleted"}), 200
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
+    
+@api.route('/photos', methods=['POST'])
+def post_photo():
+    request_body = request.get_json()
+
+    if Photo.query.filter_by(id=request_body["id"]).first():
+        return jsonify({"msg": "Duplicated image"}), 409
+   
+    photo = Photo()
+    photo.new_photo(
+        id=request_body["id"],    
+        url=request_body["url"],
+        bicycle=request_body["bicycle"],
+        helmet = request_body["helmet"],
+        price = request_body["price"],
+        user_id = request_body["user_id"]
+    )
+
