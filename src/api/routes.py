@@ -81,8 +81,19 @@ def delete_user(user_id):
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
     
+   
+
+
+
+
+
+
+
+
+
+
 @api.route('/photos', methods=['POST'])
-def post_photo():
+def new_photo():
     request_body = request.get_json()
 
     if Photo.query.filter_by(id=request_body["id"]).first():
@@ -95,6 +106,50 @@ def post_photo():
         bicycle=request_body["bicycle"],
         helmet = request_body["helmet"],
         price = request_body["price"],
+       # user_id = request_body["user_id"] PREGUNTAR
+    )
+
+    db.session.add(new_photo)
+    db.session.commit()
+
+    return jsonify({"msg": "Photo created", "photo": new_photo.serialize()}),201
+
+@api.route('/photos', methods = ['GET'])
+def get_photos(): 
+    photos = Photo.query.all()
+    photos_serialized = list(map(lambda item:item.serialize(), photos))
+    response_body = {
+        "message" : "Nice photos!",
+        "data": photos_serialized
+    }
+    if (photos == []):
+        return jsonify({"msg": "Not photos yet"}), 404
+    return jsonify(response_body), 200
+
+@api.route('/photos/<int:photo_id>', methods = ['GET'])
+def get_photo(photo_id): 
+    photo = Photo.query.get(photo_id)
+    if photo is None:
+        return jsonify({"msg": "Photo not found"}), 404
+        
+    photo_info = Photo.query.filter_by(id=photo_id).first().serialize()
+    response_body = {
+        "message" : "Nice photo!",
+        "data": photo_info
+    }
+
+    return jsonify(response_body), 200
+
+@api.route('/photos/<int:photo_id>', methods=['DELETE'])
+def delete_photo(photo_id):
+    photo = Photo.query.get(photo_id)
+    if photo:
+        Photo.query.filter_by(id=photo_id).delete()
+        db.session.delete(photo)
+        db.session.commit()
+        return jsonify({"msg": "Photo deleted"}), 200
+    else:
+        return jsonify({"msg": "Photo doesn't exist"}),401
         user_id = request_body["user_id"]
     )
 
