@@ -80,7 +80,7 @@ def delete_user(user_id):
         return jsonify({"msg": "User deleted"}), 200
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
-    
+   
 @api.route('/orders', methods=['POST'])
 def create_order():
     data = request.json
@@ -130,6 +130,3 @@ def delete_order(order_id):
     db.session.commit()
 
     return jsonify({"msg": "Order deleted"}), 200
-
-
-
