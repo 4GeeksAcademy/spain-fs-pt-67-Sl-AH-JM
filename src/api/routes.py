@@ -80,56 +80,17 @@ def delete_user(user_id):
         return jsonify({"msg": "User deleted"}), 200
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
+    
    
-@api.route('/orders', methods=['POST'])
-def create_order():
-    data = request.json
-    new_order = Order(**data)
-    db.session.add(new_order)
-    db.session.commit()
-    return jsonify({"msg": "Order created", "order": new_order.serialize()}), 201
 
 
-@api.route('/orders', methods=['GET'])
-def get_orders():
-    orders = Order.query.all()
-    orders_list = [order.serialize() for order in orders]
-    return jsonify({"msg": "Orders retrieved", "orders": orders_list}), 200
 
 
-@api.route('/orders/<int:order_id>', methods=['GET'])
-def get_order(order_id):
-    order = Order.query.get(order_id)
-    if order is None:
-        return jsonify({"msg": "Order not found"}), 404
-
-    return jsonify({"msg": "Order retrieved", "order": order.serialize()}), 200
 
 
-@api.route('/orders/<int:order_id>', methods=['PUT'])
-def update_order(order_id):
-    order = Order.query.get(order_id)
-    if order is None:
-        return jsonify({"msg": "Order not found"}), 404
-
-    data = request.json
-    for key, value in data.items():
-        setattr(order, key, value)
-    db.session.commit()
-
-    return jsonify({"msg": "Order updated", "order": order.serialize()}), 200
 
 
-@api.route('/orders/<int:order_id>', methods=['DELETE'])
-def delete_order(order_id):
-    order = Order.query.get(order_id)
-    if order is None:
-        return jsonify({"msg": "Order not found"}), 404
 
-    db.session.delete(order)
-    db.session.commit()
-
-    return jsonify({"msg": "Order deleted"}), 200
 
 @api.route('/photos', methods=['POST'])
 def new_photo():
@@ -137,7 +98,7 @@ def new_photo():
 
     if Photo.query.filter_by(id=request_body["id"]).first():
         return jsonify({"msg": "Duplicated image"}), 409
-   
+
     photo = Photo()
     photo.new_photo(
         id=request_body["id"],    
@@ -189,3 +150,67 @@ def delete_photo(photo_id):
         return jsonify({"msg": "Photo deleted"}), 200
     else:
         return jsonify({"msg": "Photo doesn't exist"}),401
+        user_id = request_body["user_id"]
+    )
+
+@api.route('/orders', methods=['POST'])
+def new_order():
+    request_body = request.get_json()
+    if Order.query.filter_by(id=request_body["id"]).first():
+        return jsonify({"msg": "Duplicated order"}), 409
+    order = Order(
+        id=request_body["id"],
+        status=request_body["status"],
+        payment_method=request_body["payment_method"],
+        user_id=request_body["user_id"]
+    )
+    db.session.add(order)
+    db.session.commit()
+
+    return jsonify({"msg": "Order created", "order": order.serialize()}), 201
+
+
+@api.route('/orders', methods = ['GET'])
+def get_orders(): 
+    orders = Order.query.all()
+    orders_serialized = list(map(lambda item:item.serialize(), orders))
+    response_body = {
+        "message" : "ok!",
+        "data": orders_serialized
+    }
+    if (get_orders == []):
+        return jsonify({"msg": "Not orders yet"}), 404
+    return jsonify(response_body), 200
+
+
+
+@api.route('/orders/<int:order_id>', methods = ['GET'])
+def get_order(order_id): 
+    order = Order.query.get(order_id)
+    if order is None:
+        return jsonify({"msg": "Order not found"}), 404
+        
+    order_info = Order.query.filter_by(id=order_id).first().serialize()    
+    response_body = {
+        "message" : "ok!",
+        "data": order_info
+    }
+
+    return jsonify(response_body), 200
+
+
+@api.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    order = Order.query.get(order_id)
+    if order:
+        Order.query.filter_by(id=order_id).delete()
+        db.session.delete(order)
+        db.session.commit()
+        return jsonify({"msg": "Order deleted"}), 200
+    else:
+        return jsonify({"msg": "Order doesn't exist"}), 401
+
+
+
+
+
