@@ -81,6 +81,23 @@ def delete_user(user_id):
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
     
+@api.route('/orders', methods=['POST'])
+def new_order():
+    request_body = request.get_json()
+    if Order.query.filter_by(id=request_body["id"]).first():
+        return jsonify({"msg": "Duplicated order"}), 409
+    order = Order(
+        id=request_body["id"],
+        status=request_body["status"],
+        payment_method=request_body["payment_method"],
+        user_id=request_body["user_id"]
+    )
+    db.session.add(order)
+    db.session.commit()
+
+    return jsonify({"msg": "Order created", "order": order.serialize()}), 201
+
+
 @api.route('/orders', methods = ['GET'])
 def get_orders(): 
     orders = Order.query.all()
@@ -109,21 +126,6 @@ def get_order(order_id):
 
     return jsonify(response_body), 200
 
-@api.route('/orders', methods=['POST'])
-def new_order():
-    request_body = request.get_json()
-    if Order.query.filter_by(id=request_body["id"]).first():
-        return jsonify({"msg": "Duplicated order"}), 409
-    order = Order(
-        id=request_body["id"],
-        status=request_body["status"],
-        payment_method=request_body["payment_method"],
-        user_id=request_body["user_id"]
-    )
-    db.session.add(order)
-    db.session.commit()
-
-    return jsonify({"msg": "Order created", "order": order.serialize()}), 201
 
 @api.route('/orders/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
