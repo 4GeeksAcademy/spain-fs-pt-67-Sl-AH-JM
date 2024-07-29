@@ -81,17 +81,6 @@ def delete_user(user_id):
     else:
         return jsonify({"msg": "User doesn't exist"}), 401
     
-   
-
-
-
-
-
-
-
-
-
-
 @api.route('/photos', methods=['POST'])
 def new_photo():
     request_body = request.get_json()
@@ -106,7 +95,7 @@ def new_photo():
         bicycle=request_body["bicycle"],
         helmet = request_body["helmet"],
         price = request_body["price"],
-       # user_id = request_body["user_id"] PREGUNTAR
+        #user_id = request_body["user_id"] PREGUNTAR
     )
 
     db.session.add(new_photo)
@@ -151,7 +140,6 @@ def delete_photo(photo_id):
     else:
         return jsonify({"msg": "Photo doesn't exist"}),401
         user_id = request_body["user_id"]
-    )
 
 @api.route('/orders', methods=['POST'])
 def new_order():
@@ -209,6 +197,7 @@ def delete_order(order_id):
         return jsonify({"msg": "Order deleted"}), 200
     else:
         return jsonify({"msg": "Order doesn't exist"}), 401
+    
 
 
 
