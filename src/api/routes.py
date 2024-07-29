@@ -199,7 +199,54 @@ def delete_order(order_id):
         return jsonify({"msg": "Order doesn't exist"}), 401
     
 
+@api.route('/orderitems', methods=['POST'])
+def new_order_item():
+    request_body = request.get_json()
+    if not request_body:
+        return jsonify({"msg": "Not found"}), 404
 
+    order_item_id = request_body.get("id")
+    order_id = request_body.get("order_id")
+    photo_id = request_body.get("photo_id")
 
+    if not all([order_item_id, order_id, photo_id]):
+        return jsonify({"msg": "Missing fields"}), 400
+
+    if OrderItems.query.filter_by(id=order_item_id).first():
+        return jsonify({"msg": "Duplicated order item"}), 409
+
+    order_item = OrderItems(
+        id=order_item_id,
+        order_id=order_id,
+        photo_id=photo_id
+    )
+    db.session.add(order_item)
+    db.session.commit()
+
+    return jsonify({"msg": "Order item created", "order_item": order_item.serialize()}),
+    
+@api.route('/orderitems/<int:order_item_id>', methods=['GET'])
+def get_order_item(order_item_id):
+    order_item = OrderItems.query.get(order_item_id)
+    if order_item is None:
+        return jsonify({"msg": "Order item not found"}), 404
+
+    order_item_info = order_item.serialize()
+    response_body = {
+        "message": "ok!",
+        "data": order_item_info
+    }
+
+    return jsonify(response_body), 200
+
+@api.route('/orderitems/<int:order_item_id>', methods=['DELETE'])
+def delete_order_item(order_item_id):
+    order_item = OrderItems.query.get(order_item_id)
+    if order_item:
+        db.session.delete(order_item)
+        db.session.commit()
+        return jsonify({"msg": "Order item deleted"}), 200
+    else:
+        return jsonify({"msg": "Order item doesn't exist"}), 404
 
 
