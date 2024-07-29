@@ -2,31 +2,31 @@ from flask_sqlalchemy import SQLAlchemy
 import enum
 
 class MyRoles(enum.Enum):
-    photographer = "Photographer"
-    rider = "Rider"
-    admin = "Admin"
+    photographer = "photographer"
+    rider = "rider"
+    admin = "admin"
 
 class StatusOrders(enum.Enum):
-    pending = "Pending"
-    completed = "Completed"
-    cancelled = "Cancelled"
+    pending = "pending"
+    completed = "completed"
+    cancelled = "cancelled"
 
 class PaymentMethods(enum.Enum):
-    credit_card = "Credit_card"
-    paypal = "Paypal"
-    cash = "Cash"
+    credit_card = "credit_card"
+    paypal = "paypal"
+    cash = "cash"
 
 class Bikes(enum.Enum):
     santa_Cruz = "Santa Cruz"
     orbea = "Orbea"
     canyon = "Canyon"
-    custom = "Custom"
+    custom = "custom"
 
 class Helmets(enum.Enum):
-    scott = "Scott"
-    troyLee = "TroyLee"
-    bluegrass = "Bluegrass"
-    custom = "Custom"
+    scott = "scott"
+    troyLee = "troyLee"
+    bluegrass = "bluegrass"
+    custom = "custom"
 
 
 db = SQLAlchemy()
@@ -59,7 +59,8 @@ class User(db.Model):
             "email": self.email,
             "username": self.username,
             "name":self.name,
-            "firstname": self.firstname
+            "firstname": self.firstname,
+            "role" : self.role.value
         }
 
 class Order(db.Model):
@@ -81,8 +82,8 @@ class Order(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "status": self.status,
-            "payment_method": self.payment_method,
+            "status": self.status.value,
+            "payment_method": self.payment_method.value,
             "user_id":self.user_id,
         }
 
@@ -110,8 +111,8 @@ class Photo(db.Model):
         return {
             'id': self.id,
             'url': self.url,
-            'bicycle': self.bicycle,
-            'helmet': self.helmet,
+            'bicycle': self.bicycle.value,
+            'helmet': self.helmet.value,
             'price': self.price,
             'user_id': self.user_id,
         }
